@@ -1,3 +1,3 @@
-module.exports = function kata(field) {
-  return field;
+module.exports = function kata() {
+  return '*';
 };
