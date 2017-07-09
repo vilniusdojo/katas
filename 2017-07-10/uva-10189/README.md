@@ -10,4 +10,4 @@ Each mine square is represented by an `*` character.
 ## Output
 
 The output must consist of lines of squares for the field in input.
-But instead of each safe square, there must be a number of adjacent mines to that square.
+But instead of each safe square, there must be a number of adjacent mine squares to that safe square.
