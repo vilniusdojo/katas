@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Title</title>
+    <meta charset="utf-8">
+    <style>
+      body {
+        font-family: 'serif';
+      }
+
+      h1, h2, h3 {
+        font-family: 'sans-serif';
+        font-weight: normal;
+        margin: 0;
+        padding: 0;
+      }
+
+      h1 {
+        font-size: 30pt !important;
+      }
+
+      h2 {
+        font-size: 20pt !important;
+      }
+
+      a, a:hover, a:visited {
+        color: #99c;
+        text-decoration: none;
+      }
+
+      .remark-code, .remark-inline-code {
+        font-family: 'monospace';
+        font-size: 10pt;
+      }
+
+      .remark-slide-content {
+        background: #fff;
+        padding: 0;
+        border: 5pt solid #666;
+        position: relative;
+      }
+
+      .remark-slide-number {
+        display: none;
+      }
+
+      .left-column {
+        width: 50%;
+        float: left;
+        overflow: auto;
+      }
+
+      .right-column {
+        width: 50%;
+        float: right;
+        overflow: auto;
+      }
+    </style>
+  </head>
+  <body>
+    <textarea id="source">
+class: middle, center
+
+# Vilnius Dojo
+
+## 2017-07-29
+
+### http://adventofcode.com/2015/day/3
+---
+# Santa: Perfectly Spherical Houses in a Vacuum
+
+Santa is delivering presents to an infinite two-dimensional grid of houses.
+
+He begins by delivering a present to the house at his starting location, and then an elf at the North Pole calls him via radio and tells him where to move next.
+Moves are always exactly one house to the north (`^`), south (`v`), east (`>`), or west (`<`).
+After each move, he delivers another present to the house at his new location.
+
+However, the elf back at the north pole has had a little too much eggnog, and so his directions are a little off, and Santa ends up visiting some houses more than once.
+How many houses receive at least one present?
+
+For example:
+
+* `>` delivers presents to 2 houses: one at the starting location, and one to the east.
+* `^>v<` delivers presents to 4 houses in a square, including twice to the house at his starting/ending location.
+* `^v^v^v^v^v` delivers a bunch of presents to some very lucky children at only 2 houses.
+---
+# Milestone 1 of 4: step left, right
+
+## steps from 1 to 4 of 11
+
+### goal
+
+.left-column[
+```diff
+ var houses = require('./kata');
+ var equal = require('assert').deepStrictEqual;
+
+-describe('visited houses count', function () {
+-  it('is initially 1', function () {
+-    equal(houses(''), 1);
++describe('visited houses', function () {
++  it('is initially 0-0', function () {
++    equal(houses(''), ['0-0']);
++  });
++  it('is 0-0, -1-0, after a step left', function () {
++    equal(houses('<'), ['0-0', '-1-0']);
++  });
++  it('is 0-0, -1-0, after a step left and step right', function () {
++    equal(houses('<>'), ['0-0', '-1-0']);
+   });
+ });
+```
+]
+.right-column[
+```diff
+ module.exports = function houses(steps) {
+-  return 1;
++  return ['0-0'].concat(steps.length > 0 ? ['-1-0'] : []);
+ };
+```
+]
+---
+# Wikipedia
+
+Pair programming is an agile software development technique in which two programmers work together at one workstation. One, the driver, writes code while the other, the observer or navigator,[1] reviews each line of code as it is typed in. The two programmers switch roles frequently.
+
+While reviewing, the observer also considers the "strategic" direction of the work, coming up with ideas for improvements and likely future problems to address. This frees the driver to focus all of his or her attention on the "tactical" aspects of completing the current task, using the observer as a safety net and guide.
+---
+# Milestone 2 of 4: uniq, step up, down
+
+## steps from 4 to 7 of 11
+
+.left-column[
+```diff
+   it('is 0-0, -1-0, after a step left and step right', function () {
+     equal(houses('<>'), ['0-0', '-1-0']);
+   });
++  it('is 0-0, 1-0, after a step right and step left', function () {
++    equal(houses('><'), ['0-0', '1-0']);
++  });
++  it('is 0-0, 0-1, after a step up', function () {
++    equal(houses('^'), ['0-0', '0-1']);
++  });
++  it('is 0-0, 0--1, after a step down', function () {
++    equal(houses('v'), ['0-0', '0--1']);
++  });
+ });
+```
+]
+.right-column[
+```diff
+ module.exports = function houses(steps) {
+-  return ['0-0'].concat(steps.length > 0 ? ['-1-0'] : []);
++  var location = [0, 0];
++  var houses = [location[0] + '-' + location[1]];
++  steps.split('').forEach(function (step) {
++    if (step === '<') {
++      location[0] -= 1;
++    }
++    if (step === '>') {
++      location[0] += 1;
++    }
++    if (step === '^') {
++      location[1] += 1;
++    }
++    if (step === 'v') {
++      location[1] -= 1;
++    }
++    var house = location[0] + '-' + location[1];
++    if (houses.indexOf(house) < 0) {
++      houses.push(house);
++    }
++  });
++  return houses;
+ };
+```
+]
+---
+# Robo Santa: Perfectly Spherical Houses in a Vacuum
+
+The next year, to speed up the process, Santa creates a robot version of himself, Robo-Santa, to deliver presents with him.
+
+Santa and Robo-Santa start at the same location (delivering two presents to the same starting house), then take turns moving based on instructions from the elf, who is eggnoggedly reading from the same script as the previous year.
+
+This year, how many houses receive at least one present?
+
+For example:
+
+* `^v` delivers presents to 3 houses, because Santa goes north, and then Robo-Santa goes south.
+* `^>v<` now delivers presents to 3 houses, and Santa and Robo-Santa end up back where they started.
+* `^v^v^v^v^v` now delivers presents to 11 houses, with Santa going one direction and Robo-Santa going the other.
+---
+# Milestone 3 of 4: santa and robo-santa
+
+## steps from 7 to 9 of 11
+
+.left-column[
+```diff
+@@ -1,4 +1,6 @@
+-var houses = require('./kata');
++var kata = require('./kata');
++var houses = kata.houses.bind(kata);
++var housesByTwoSantas = kata.housesByTwoSantas.bind(kata);
+ var equal = require('assert').deepStrictEqual;
+ 
+ describe('visited houses', function () {
+@@ -20,4 +22,13 @@
+   it('is 0-0, 0--1, after a step down', function () {
+     equal(houses('v'), ['0-0', '0--1']);
+   });
++});
++
++describe('two santas', function () {
++  it('is initially 0-0', function () {
++    equal(housesByTwoSantas(''), ['0-0']);
++  });
++  it('is 0-0, -1-0, 1-0, when script is <>', function () {
++    equal(housesByTwoSantas('<>'), ['0-0', '-1-0', '1-0']);
++  });
+ });
+```
+]
+.right-column[
+```diff
+-module.exports = function houses(steps) {
+-  var location = [0, 0];
+...
+-  return houses;
++module.exports = {
++  houses: function houses(steps) {
++    var location = [0, 0];
+...
++    return houses;
++  },
++  housesByTwoSantas: function santas(steps) {
++    var santa = [];
++    var roboSanta = [];
++    steps.split('').forEach(function (step, index) {
++      (index % 2 ? roboSanta : santa).push(step);
++    });
++    var houses = this.houses(santa.join(''));
++    this.houses(roboSanta.join('')).forEach(function (house) {
++      if (houses.indexOf(house) < 0) {
++        houses.push(house);
++      }
++    });
++    return houses;
++  }
+ };
+```
+]
+---
+# Milestone 4 of 4: check lib is used
+
+## steps from 9 to 11 of 11
+
+.left-column[
+```diff
+@@ -31,4 +31,15 @@
+   it('is 0-0, -1-0, 1-0, when script is <>', function () {
+     equal(housesByTwoSantas('<>'), ['0-0', '-1-0', '1-0']);
+   });
++  it('uses .houses method', function () {
++    var houses = kata.houses;
++    var inputs = [];
++    kata.houses = function (input) {
++      inputs.push(input);
++      return ['call-' + inputs.length];
++    };
++    equal(housesByTwoSantas('xyzq'), ['call-1', 'call-2']);
++    equal(inputs, ['xz', 'yq']);
++    kata.houses = houses;
++  });
+ });
+```
+]
+.right-column[
+```diff
+@@ -1,3 +1,9 @@
++function pushUnique(array, item) {
++  if (array.indexOf(item) < 0) {
++    array.push(item);
++  }
++}
++
+ module.exports = {
+   houses: function houses(steps) {
+     var location = [0, 0];
+@@ -15,10 +21,7 @@
+       if (step === 'v') {
+         location[1] -= 1;
+       }
+-      var house = location[0] + '-' + location[1];
+-      if (houses.indexOf(house) < 0) {
+-        houses.push(house);
+-      }
++      pushUnique(houses, location[0] + '-' + location[1]);
+     });
+     return houses;
+   },
+@@ -29,11 +32,8 @@
+       (index % 2 ? roboSanta : santa).push(step);
+     });
+     var houses = this.houses(santa.join(''));
+-    this.houses(roboSanta.join('')).forEach(function (house) {
+-      if (houses.indexOf(house) < 0) {
+-        houses.push(house);
+-      }
+-    });
++    this.houses(roboSanta.join(''))
++      .forEach(pushUnique.bind(null, houses));
+     return houses;
+   }
+ };
+```
+]
+    </textarea>
+    <script src="./remark-latest.min.js">
+    </script>
+    <script>
+      var slideshow = remark.create();
+    </script>
+  </body>
+</html>
