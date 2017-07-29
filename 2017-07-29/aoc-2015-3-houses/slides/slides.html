@@ -20,6 +20,10 @@
       }
 
       h2 {
+        font-size: 24pt !important;
+      }
+
+      h3 {
         font-size: 20pt !important;
       }
 
@@ -55,9 +59,22 @@
         float: right;
         overflow: auto;
       }
+
+      #timer {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        text-align: center;
+      }
     </style>
   </head>
-  <body>
+  <body onload="init()">
+    <script>
+function init() {
+  var timer = document.getElementById('timer');
+  timer.innerHTML = new Date();
+}
+    </script>
     <textarea id="source">
 class: middle, center
 
@@ -66,6 +83,7 @@ class: middle, center
 ## 2017-07-29
 
 ### http://adventofcode.com/2015/day/3
+### https://github.com/vilniusdojo/katas
 ---
 # Santa: Perfectly Spherical Houses in a Vacuum
 
@@ -90,7 +108,6 @@ For example:
 
 ### goal
 
-.left-column[
 ```diff
  var houses = require('./kata');
  var equal = require('assert').deepStrictEqual;
@@ -110,15 +127,19 @@ For example:
    });
  });
 ```
-]
-.right-column[
+---
+# Milestone 1 of 4: step left, right
+
+## steps from 1 to 4 of 11
+
+### solution
+
 ```diff
  module.exports = function houses(steps) {
 -  return 1;
 +  return ['0-0'].concat(steps.length > 0 ? ['-1-0'] : []);
  };
 ```
-]
 ---
 # Wikipedia
 
@@ -130,7 +151,8 @@ While reviewing, the observer also considers the "strategic" direction of the wo
 
 ## steps from 4 to 7 of 11
 
-.left-column[
+### goal
+
 ```diff
    it('is 0-0, -1-0, after a step left and step right', function () {
      equal(houses('<>'), ['0-0', '-1-0']);
@@ -146,8 +168,13 @@ While reviewing, the observer also considers the "strategic" direction of the wo
 +  });
  });
 ```
-]
-.right-column[
+---
+# Milestone 2 of 4: uniq, step up, down
+
+## steps from 4 to 7 of 11
+
+### solution
+
 ```diff
  module.exports = function houses(steps) {
 -  return ['0-0'].concat(steps.length > 0 ? ['-1-0'] : []);
@@ -174,7 +201,6 @@ While reviewing, the observer also considers the "strategic" direction of the wo
 +  return houses;
  };
 ```
-]
 ---
 # Robo Santa: Perfectly Spherical Houses in a Vacuum
 
@@ -320,5 +346,6 @@ For example:
     <script>
       var slideshow = remark.create();
     </script>
+    <div id="timer"></div>
   </body>
 </html>
